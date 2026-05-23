@@ -1,193 +1,146 @@
-# 第二大腦使用說明
+# 第二大腦與設備專案管理
 
-這是一個用 Markdown 管理的 Second Brain，用來保存、整理、萃取並利用你找到的資料。這個知識庫採用《Building a Second Brain》的兩個核心方法：
+這個資料夾是 Markdown-based second brain，也用來管理設備軟體專案。日常使用時看這份 `README.md`；AI agent 的完整工作規範看 `AGENTS.md`。
+
+核心方法：
 
 - `CODE`：Capture、Organize、Distill、Express
 - `PARA`：Projects、Areas、Resources、Archives
+- `Progressive Summarization`：逐層萃取重點，讓筆記未來可重用
 
-根目錄的 `AGENTS.md` 是給 AI agent 讀的工作規範；這份 `README.md` 是給你日常使用時看的快速說明。
+## 這個資料夾用來做什麼
 
-## 資料夾用途
+- 保存新資料、想法、會議紀錄、研究素材。
+- 把資料整理成可支援行動、決策、專案推進的知識資產。
+- 管理多個設備軟體專案的時程、Issue、決策與交付狀態。
+- 從筆記產出文章、簡報、決策 memo、SOP、行動清單或研究報告。
+
+## 資料夾結構
 
 ```text
-00_Inbox/       暫存未整理、還不知道怎麼歸類的資料
-10_Projects/    有明確成果、期限或完成條件的專案資料
-20_Areas/       需要長期維護的責任領域
-30_Resources/   未來可能有用的主題、興趣、研究素材
-40_Archives/    已完成、暫停、過期或不再活躍的資料
-90_Outputs/     從筆記轉化出來的文章、簡報、清單、報告等成果
+00_Inbox/       尚未整理、歸類不明、來源不完整、需確認
+10_Projects/    有成果、期限、完成條件的活躍專案
+20_Areas/       長期維護的責任領域
+30_Resources/   未來可能有用的主題、研究素材、參考內容
+40_Archives/    已完成、暫停、過期、不活躍但可查找
+90_Outputs/     由筆記轉化出的文章、簡報、memo、SOP、報告等成果
+templates/       可複製的專案與筆記模板
+toolbox/         YouTube、PDF、專案提醒等輔助工具
 ```
 
-## 最簡單的使用方式
+每個主要資料夾都有 `目錄.md`。找資料時先看目錄，再讀完整筆記；新增、更新、移動或封存筆記後，也要同步更新目錄。
 
-1. 先把新資料丟進 `00_Inbox/`。
-2. 請 AI 依照 `AGENTS.md` 整理這份資料。
-3. AI 會判斷它應該放入 `Projects`、`Areas`、`Resources` 或 `Archives`。
-4. AI 會用 `CODE` 流程整理成可重用的 Markdown 筆記。
-5. AI 會同步更新對應資料夾的 `目錄.md`。
-6. 如果資料能變成文章、簡報、決策 memo、行動清單或 SOP，就放入 `90_Outputs/`。
+## 日常使用流程
 
-你可以直接對 AI 說：
+1. 新資料先放進 `00_Inbox/`。
+2. 請 AI 依 `AGENTS.md` 用 `CODE` 與 `PARA` 整理。
+3. AI 會判斷資料屬於 `Projects`、`Areas`、`Resources`、`Archives` 或繼續留在 Inbox。
+4. 有可交付成果時，整理到 `90_Outputs/`。
+5. 有變動時，同步更新對應資料夾的 `目錄.md`。
+
+常用指令：
 
 ```text
 請依照 AGENTS.md，用 CODE 和 PARA 整理 00_Inbox 裡的新資料。
 ```
 
-或：
-
-```text
-請把這篇文章整理成第二大腦筆記，判斷 PARA 分類，萃取重點，並提出可能輸出。
-```
-
-## 目錄.md 的用途
-
-每個主要資料夾都有一份 `目錄.md`，它是該資料夾的索引頁。
-
-用途：
-
-- 讓你快速知道資料夾裡有哪些內容。
-- 讓 AI 先讀短索引，再決定要不要讀完整筆記。
-- 避免未來資料變多時，每次都掃描大量筆記，浪費 token。
-- 記錄每份筆記的狀態、摘要、更新日期與可能用途。
-
-使用方式：
-
-1. 找資料時，先打開相關資料夾的 `目錄.md`。
-2. 如果目錄摘要符合需求，再打開完整筆記。
-3. 新增、移動、更新或封存筆記後，請 AI 同步更新 `目錄.md`。
-
-你可以直接對 AI 說：
-
 ```text
 請先讀各資料夾的目錄.md，再找與這個問題相關的筆記，不要一開始就讀全部全文。
 ```
 
-## PARA 判斷方式
+## 設備專案快速建立
 
-整理資料時，先問這幾個問題：
-
-```text
-這會幫助我完成某個有期限或成果的事情嗎？
--> 放到 10_Projects
-
-這是我需要長期維持或負責的領域嗎？
--> 放到 20_Areas
-
-這是未來可能有用的主題、素材或興趣嗎？
--> 放到 30_Resources
-
-這已經完成、暫停、過期或不再活躍嗎？
--> 放到 40_Archives
-
-我還不確定嗎？
--> 先放到 00_Inbox，標記 needs-review
-```
-
-重點是先判斷「用途」，不要只根據「主題」分類。例如一篇 AI 寫作文章，如果正在支援某個文章專案，就放 `10_Projects/`；如果只是未來參考，才放 `30_Resources/`。
-
-## CODE 整理流程
-
-### Capture
-
-捕捉值得保留的內容：
-
-- 來源、作者、網址、日期
-- 核心摘要
-- 重要觀點、數據、問題、靈感
-- 未來可能用途
-
-### Organize
-
-用 `PARA` 決定資料位置。優先放到最能支援行動的位置。
-
-### Distill
-
-用 `Progressive Summarization` 萃取重點：
-
-- 先摘要
-- 再列 key ideas
-- 再標出真正重要的 distilled points
-- 最後寫出 implications
-
-### Express
-
-把資料轉化成可用成果：
-
-- 下一步行動
-- 可寫成的文章
-- 可做成的簡報
-- 可形成的 SOP
-- 可支援的決策
-- 後續研究問題
-
-## 建議筆記格式
-
-整理後的筆記建議使用：
-
-```markdown
----
-title:
-source:
-created:
-updated:
-para:
-tags:
-status:
----
-
-# Title
-
-## Summary
-
-## Key Ideas
-
-## Highlights
-
-## Distilled Points
-
-## Implications
-
-## Action Items
-
-## Possible Outputs
-
-## Related Notes
-
-## Questions
-```
-
-建議檔名：
+設備軟體專案使用模板：
 
 ```text
-YYYY-MM-DD - descriptive-title.md
+templates/equipment-project-template/
 ```
 
-範例：
+新增專案時，複製到：
 
 ```text
-2026-05-17 - building-a-second-brain-code-para.md
+10_Projects/<project-slug>/
 ```
 
-## 日常維護節奏
+然後更新：
 
-建議每週做一次簡單整理：
+- `project.md`：專案總覽、範圍、owner、release 條件
+- `schedule.md`：裝機時程、stage gate、提醒日期
+- `issues.md`：Issue list、嚴重度、owner、next action、target date
+- `tasks.md`：Next Actions、Waiting、Scheduled、Done
+- `decisions.md`：重要決策與原因
+- `meetings.md`：會議紀錄與 action items
+- `resources.md`：規格、圖面、IO list、程式版本、備份路徑
+- `10_Projects/目錄.md`：跨專案 dashboard
 
-1. 檢查 `00_Inbox/` 是否有未整理資料。
-2. 把能判斷用途的內容移到 PARA 對應資料夾。
-3. 將重要筆記補上 `Distilled Points`、`Action Items`、`Possible Outputs`。
-4. 把完成或不再活躍的專案移到 `40_Archives/`。
-5. 更新所有有變動資料夾的 `目錄.md`。
-6. 從重要筆記中挑一個轉成 `90_Outputs/` 裡的成果。
-
-## 給 AI 的常用指令
+常用指令：
 
 ```text
-請整理 00_Inbox 裡尚未整理的資料，依照 AGENTS.md 執行 CODE 和 PARA。
+請用 templates/equipment-project-template 建立一個新的設備軟體專案，放到 10_Projects，並更新 10_Projects/目錄.md。
 ```
 
+## 裝機時程與 Issue 追蹤
+
+設備專案標準階段：
+
 ```text
-請先讀各資料夾的目錄.md，再找相關筆記；只有必要時才讀完整筆記。
+開工 > 開 BOM > 組裝配線 > 送電 > IO Check > 機台測試 > 交機 move in > 客戶端組裝送電 > 整合測試 > release 產線
 ```
+
+追蹤原則：
+
+- 每個 stage 都要有 `Target Date`、`Remind On`、`Owner`、`Status`。
+- 影響時程的問題要寫進 `issues.md`，並連回對應 stage。
+- `critical` 或 `high` issue 未關閉時，不應進下一個 stage gate，除非已有明確 workaround。
+- 每次更新專案狀態後，同步更新 `10_Projects/目錄.md` 的目前階段、下一步、風險/阻塞。
+
+## 提醒掃描流程
+
+處理專案進度、週報、提醒或逾期項目時，固定流程是：
+
+1. 先讀 `10_Projects/目錄.md`。
+2. 執行 Python 掃描工具。
+3. 若有提醒、逾期或阻塞，再讀對應專案的 `schedule.md`、`issues.md`。
+4. 需要背景時，再讀 `decisions.md`、`meetings.md`、`resources.md`。
+
+掃描未來 7 天提醒與逾期項目：
+
+```powershell
+& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py
+```
+
+指定日期與往後天數：
+
+```powershell
+& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+```
+
+常用指令：
+
+```text
+請先讀 10_Projects/目錄.md，再執行 project_reminder_scan.py，整理目前需要注意的專案提醒、逾期項目與 next actions。
+```
+
+## CODE / PARA 整理規則
+
+PARA 判斷：
+
+```text
+這會幫助我完成某個有期限或成果的事情嗎？ -> 10_Projects
+這是需要長期維持或負責的領域嗎？ -> 20_Areas
+這是未來可能有用的主題、素材或參考嗎？ -> 30_Resources
+這已完成、暫停、過期或不活躍嗎？ -> 40_Archives
+還不確定嗎？ -> 00_Inbox，標記 needs-review
+```
+
+CODE 流程：
+
+- `Capture`：保留來源、作者、網址、日期、摘要、重點與可能用途。
+- `Organize`：放到最能支援行動的位置。
+- `Distill`：萃取 `Summary`、`Key Ideas`、`Highlights`、`Distilled Points`、`Implications`。
+- `Express`：產生 `Action Items`、`Possible Outputs`、`Questions`、`Related Notes`。
+
+## 常用 AI 指令
 
 ```text
 請檢查這份筆記應該屬於 Project、Area、Resource 還是 Archive，並說明理由。
@@ -198,13 +151,41 @@ YYYY-MM-DD - descriptive-title.md
 ```
 
 ```text
-請從 30_Resources 裡找出可以轉成文章或簡報的素材，產生到 90_Outputs。
-```
-
-```text
-請幫我整理 10_Projects，把已完成或不活躍的內容移到 40_Archives。
+請整理 10_Projects，檢查目前階段、逾期項目、open issues 和下一步。
 ```
 
 ```text
 請檢查所有目錄.md 是否和資料夾內筆記一致，並更新過期索引。
 ```
+
+```text
+請從 30_Resources 找出可以轉成文章、簡報或 SOP 的素材，產生到 90_Outputs。
+```
+
+## 工具指令
+
+指定 Python：
+
+```text
+C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
+```
+
+YouTube 字幕擷取：
+
+```powershell
+& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+```
+
+PDF 原始抽取：
+
+```powershell
+& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+```
+
+專案提醒掃描：
+
+```powershell
+& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py
+```
+
+工具會自動把 YouTube/PDF 結果放入 `00_Inbox/` 並更新 `00_Inbox/目錄.md`；這些結果仍只是 Capture 階段，需要再依 `CODE` / `PARA` 整理。
