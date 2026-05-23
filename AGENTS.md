@@ -83,6 +83,14 @@ status:
 - 預設使用標準 Markdown 連結；不依賴 Obsidian 語法。
 - 若使用 wikilinks 也要讓知識庫仍可用一般 Markdown 閱讀。
 
+## 版本控制與 commit 規範
+
+- 為避免機密外洩，commit 只能包含規範、模板、工具程式或明確可公開的設定檔；預設只提交本規範相關變更。
+- 所有整理過的文件與知識庫內容一律不得 commit，包含 `00_Inbox/`、`10_Projects/`、`20_Areas/`、`30_Resources/`、`40_Archives/`、`90_Outputs/` 及其子資料夾內的檔案。
+- 不使用 `git add .`、`git add -A` 或其他會批次加入知識庫內容的命令；只能用明確檔名 stage 可提交的規範檔。
+- commit 前必須執行 `git status --short` 與 `git diff --cached --name-only`，確認 staged 檔案沒有任何整理後文件、專案資料、目錄索引、逐字稿、PDF 抽取內容或 assets。
+- 若使用者要求 commit 筆記、整理成果、專案文件或輸出成果，必須先提醒有機密外洩風險，且不得執行，除非使用者明確指定可公開的單一檔案與原因。
+
 ## 設備專案管理
 
 設備軟體專案採「機種 / 工單」兩層結構。同機種共用資訊放在 `10_Projects/<machine-model>/`，單張工單放在 `10_Projects/<machine-model>/<work-order-id>/`。工單才是 PARA 意義上的 active project。
