@@ -50,16 +50,47 @@ toolbox/         YouTube、PDF、專案提醒等輔助工具
 
 ## 設備專案快速建立
 
-設備軟體專案使用模板：
+設備軟體專案採「機種 / 工單」兩層結構。同機種共用資訊放在機種資料夾，實際交付與時程追蹤放在工單資料夾。
+
+```text
+10_Projects/
+  <machine-model>/
+    目錄.md
+    model.md
+    common-resources.md
+    <work-order-id>/
+      project.md
+      schedule.md
+      issues.md
+      tasks.md
+      decisions.md
+      meetings.md
+      resources.md
+      outputs/
+```
+
+新增機種時使用模板：
+
+```text
+templates/equipment-model-template/
+```
+
+複製到：
+
+```text
+10_Projects/<machine-model>/
+```
+
+新增工單時使用模板：
 
 ```text
 templates/equipment-project-template/
 ```
 
-新增專案時，複製到：
+複製到：
 
 ```text
-10_Projects/<project-slug>/
+10_Projects/<machine-model>/<work-order-id>/
 ```
 
 然後更新：
@@ -71,12 +102,13 @@ templates/equipment-project-template/
 - `decisions.md`：重要決策與原因
 - `meetings.md`：會議紀錄與 action items
 - `resources.md`：規格、圖面、IO list、程式版本、備份路徑
-- `10_Projects/目錄.md`：跨專案 dashboard
+- 機種 `目錄.md`：同機種工單 dashboard
+- `10_Projects/目錄.md`：跨機種/工單 dashboard
 
 常用指令：
 
 ```text
-請用 templates/equipment-project-template 建立一個新的設備軟體專案，放到 10_Projects，並更新 10_Projects/目錄.md。
+請先確認或建立機種資料夾，再用 templates/equipment-project-template 建立新工單，並更新機種目錄與 10_Projects/目錄.md。
 ```
 
 ## 裝機時程與 Issue 追蹤
@@ -89,10 +121,10 @@ templates/equipment-project-template/
 
 追蹤原則：
 
-- 每個 stage 都要有 `Target Date`、`Remind On`、`Owner`、`Status`。
+- 每張工單的每個 stage 都要有 `Target Date`、`Remind On`、`Owner`、`Status`。
 - 影響時程的問題要寫進 `issues.md`，並連回對應 stage。
 - `critical` 或 `high` issue 未關閉時，不應進下一個 stage gate，除非已有明確 workaround。
-- 每次更新專案狀態後，同步更新 `10_Projects/目錄.md` 的目前階段、下一步、風險/阻塞。
+- 每次更新工單狀態後，同步更新機種 `目錄.md` 與 `10_Projects/目錄.md` 的目前階段、下一步、風險/阻塞。
 
 ## 提醒掃描流程
 
@@ -100,8 +132,8 @@ templates/equipment-project-template/
 
 1. 先讀 `10_Projects/目錄.md`。
 2. 執行 Python 掃描工具。
-3. 若有提醒、逾期或阻塞，再讀對應專案的 `schedule.md`、`issues.md`。
-4. 需要背景時，再讀 `decisions.md`、`meetings.md`、`resources.md`。
+3. 若有提醒、逾期或阻塞，先讀對應機種 `目錄.md`，再讀工單的 `schedule.md`、`issues.md`。
+4. 需要背景時，再讀工單 `decisions.md`、`meetings.md`、`resources.md` 或機種 `common-resources.md`。
 
 掃描未來 7 天提醒與逾期項目：
 
@@ -161,6 +193,17 @@ CODE 流程：
 ```text
 請從 30_Resources 找出可以轉成文章、簡報或 SOP 的素材，產生到 90_Outputs。
 ```
+
+## 編碼規則
+
+所有 Markdown 檔案都用 UTF-8 讀寫，避免繁體中文亂碼。使用 PowerShell 檢查檔案時，優先指定：
+
+```powershell
+Get-Content -Encoding UTF8 README.md
+Get-Content -Encoding UTF8 AGENTS.md
+```
+
+AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 UTF-8。
 
 ## 工具指令
 

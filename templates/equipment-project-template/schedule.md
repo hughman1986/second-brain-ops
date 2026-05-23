@@ -17,7 +17,7 @@ tags:
 - `target_date` 前 3 天：確認前置條件、owner、風險。
 - `target_date` 當天：確認是否完成，未完成要新增或更新 issue。
 - `target_date` 後仍非 `done`：標記 `overdue`，並在 `issues.md` 建立阻塞項。
-- 每次更新時，同步更新 `10_Projects/目錄.md` 的「目前階段」、「下一步」、「風險/阻塞」。
+- 每次更新時，同步更新機種資料夾 `目錄.md` 與 `10_Projects/目錄.md` 的「目前階段」、「下一步」、「風險/阻塞」。
 
 ## Stage Timeline
 

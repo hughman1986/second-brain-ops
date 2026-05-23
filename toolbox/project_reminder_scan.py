@@ -1,4 +1,4 @@
-"""Scan active project schedules and issues for due reminders.
+"""Scan active equipment work orders for due reminders.
 
 Usage:
     python toolbox/project_reminder_scan.py
@@ -20,7 +20,8 @@ DONE_STATUSES = {"done", "closed", "cancelled", "canceled", "skipped"}
 
 @dataclass
 class Reminder:
-    project: str
+    machine_model: str
+    work_order: str
     source: str
     kind: str
     item: str
@@ -33,7 +34,7 @@ class Reminder:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Scan 10_Projects for due schedule and issue reminders."
+        description="Scan 10_Projects recursively for due schedule and issue reminders."
     )
     parser.add_argument(
         "--date",
@@ -75,7 +76,7 @@ def read_markdown_tables(path: Path) -> list[list[dict[str, str]]]:
     current_header: list[str] | None = None
     current_rows: list[dict[str, str]] = []
 
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
+    for raw_line in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw_line.strip()
         if not line.startswith("|") or not line.endswith("|"):
             if current_header and current_rows:
@@ -102,6 +103,25 @@ def read_markdown_tables(path: Path) -> list[list[dict[str, str]]]:
     return tables
 
 
+def project_context(path: Path) -> tuple[str, str]:
+    """Return machine model and work order for a schedule/issues file.
+
+    Preferred structure:
+        10_Projects/<machine-model>/<work-order-id>/schedule.md
+
+    Legacy structure is still supported:
+        10_Projects/<project-slug>/schedule.md
+    """
+
+    relative_parts = path.relative_to(PROJECTS_DIR).parts
+    parent_parts = relative_parts[:-1]
+    if len(parent_parts) >= 2:
+        return parent_parts[0], parent_parts[-1]
+    if len(parent_parts) == 1:
+        return "", parent_parts[0]
+    return "", ""
+
+
 def should_report(
     status: str,
     target_date: date | None,
@@ -124,9 +144,9 @@ def should_report(
     return False, ""
 
 
-def scan_schedule(project_dir: Path, today: date, horizon: date) -> list[Reminder]:
+def scan_schedule(path: Path, today: date, horizon: date) -> list[Reminder]:
     reminders: list[Reminder] = []
-    path = project_dir / "schedule.md"
+    machine_model, work_order = project_context(path)
     for table in read_markdown_tables(path):
         if not table or "Stage" not in table[0]:
             continue
@@ -142,8 +162,9 @@ def scan_schedule(project_dir: Path, today: date, horizon: date) -> list[Reminde
                 continue
             reminders.append(
                 Reminder(
-                    project=project_dir.name,
-                    source="schedule.md",
+                    machine_model=machine_model,
+                    work_order=work_order,
+                    source=str(path.relative_to(PROJECTS_DIR)).replace("\\", "/"),
                     kind=kind,
                     item=stage,
                     status=status,
@@ -156,9 +177,9 @@ def scan_schedule(project_dir: Path, today: date, horizon: date) -> list[Reminde
     return reminders
 
 
-def scan_issues(project_dir: Path, today: date, horizon: date) -> list[Reminder]:
+def scan_issues(path: Path, today: date, horizon: date) -> list[Reminder]:
     reminders: list[Reminder] = []
-    path = project_dir / "issues.md"
+    machine_model, work_order = project_context(path)
     for table in read_markdown_tables(path):
         if not table or "ID" not in table[0] or "Issue" not in table[0]:
             continue
@@ -175,8 +196,9 @@ def scan_issues(project_dir: Path, today: date, horizon: date) -> list[Reminder]
                 continue
             reminders.append(
                 Reminder(
-                    project=project_dir.name,
-                    source="issues.md",
+                    machine_model=machine_model,
+                    work_order=work_order,
+                    source=str(path.relative_to(PROJECTS_DIR)).replace("\\", "/"),
                     kind=kind,
                     item=f"{issue_id} {issue}".strip(),
                     status=status,
@@ -195,11 +217,10 @@ def scan_projects(today: date, days: int) -> list[Reminder]:
     if not PROJECTS_DIR.exists():
         return reminders
 
-    for project_dir in sorted(PROJECTS_DIR.iterdir()):
-        if not project_dir.is_dir():
-            continue
-        reminders.extend(scan_schedule(project_dir, today, horizon))
-        reminders.extend(scan_issues(project_dir, today, horizon))
+    for path in sorted(PROJECTS_DIR.rglob("schedule.md")):
+        reminders.extend(scan_schedule(path, today, horizon))
+    for path in sorted(PROJECTS_DIR.rglob("issues.md")):
+        reminders.extend(scan_issues(path, today, horizon))
     return reminders
 
 
@@ -214,14 +235,15 @@ def print_report(reminders: list[Reminder], today: date, days: int) -> None:
         print("No due or upcoming reminders found.")
         return
 
-    print("| Kind | Project | Source | Item | Status | Owner | Target Date | Remind On | Message |")
-    print("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    print("| Kind | Machine Model | Work Order | Source | Item | Status | Owner | Target Date | Remind On | Message |")
+    print("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for reminder in sorted(
         reminders,
         key=lambda item: (
             item.due_date or date.max,
             item.remind_on or date.max,
-            item.project,
+            item.machine_model,
+            item.work_order,
             item.item,
         ),
     ):
@@ -230,7 +252,8 @@ def print_report(reminders: list[Reminder], today: date, days: int) -> None:
             + " | ".join(
                 [
                     reminder.kind,
-                    reminder.project,
+                    reminder.machine_model,
+                    reminder.work_order,
                     reminder.source,
                     reminder.item,
                     reminder.status,

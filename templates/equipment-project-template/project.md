@@ -5,8 +5,11 @@ updated: 2026-05-23
 para: project
 status: planning
 project_type: equipment-software
+machine_model:
+work_order_id:
 customer:
 site:
+tool_id:
 owner:
 deadline:
 tags:
@@ -22,6 +25,8 @@ tags:
 | --- | --- |
 | Customer |  |
 | Site |  |
+| Machine Model |  |
+| Work Order ID |  |
 | Equipment / Tool ID |  |
 | Software Scope | PLC / HMI / motion / vision / SECS-GEM / data collection / recipe / other |
 | Current Stage | 開工 |
@@ -88,6 +93,8 @@ tags:
 - [會議紀錄](meetings.md)
 - [專案資源](resources.md)
 - [專案輸出](outputs/)
+- [機種總覽](../model.md)
+- [機種共用資源](../common-resources.md)
 
 ## Review Rhythm
 
@@ -97,4 +104,4 @@ tags:
 
 ## Notes
 
-- 分類假設：此模板用於有明確交付結果與 release 條件的設備軟體專案，歸入 `10_Projects/`。
+- 分類假設：此模板用於單一工單；工單是 PARA 意義上的 project，建議放在 `10_Projects/<machine-model>/<work-order-id>/`。

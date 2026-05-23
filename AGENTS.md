@@ -5,6 +5,7 @@
 ## 基本原則
 
 - 內容以繁體中文為主，保留必要英文方法名與專有名詞。
+- 所有 Markdown 檔案一律用 UTF-8 讀寫；PowerShell 讀檔用 `Get-Content -Encoding UTF8`，寫檔或工具輸出也要確保 UTF-8，避免繁中亂碼。
 - 優先保留與使用者目標、責任、興趣、輸出有關的內容。
 - 每次整理都判斷：未來用途、所屬 PARA、next action、可否轉成文章/簡報/決策/清單/研究卡片/SOP/其他 output。
 - 產出清楚、可搜尋、可重用的 Markdown，避免過度分類。
@@ -84,7 +85,9 @@ status:
 
 ## 設備專案管理
 
-設備軟體專案使用 `templates/equipment-project-template/` 複製到 `10_Projects/<project-slug>/`，並更新 `project.md`、`schedule.md`、`issues.md` 與 `10_Projects/目錄.md`。
+設備軟體專案採「機種 / 工單」兩層結構。同機種共用資訊放在 `10_Projects/<machine-model>/`，單張工單放在 `10_Projects/<machine-model>/<work-order-id>/`。工單才是 PARA 意義上的 active project。
+
+新增機種時複製 `templates/equipment-model-template/` 到 `10_Projects/<machine-model>/`；新增工單時複製 `templates/equipment-project-template/` 到 `10_Projects/<machine-model>/<work-order-id>/`。更新工單 `project.md`、`schedule.md`、`issues.md`，並同步更新機種 `目錄.md` 與 `10_Projects/目錄.md`。
 
 標準裝機階段：
 
@@ -96,8 +99,8 @@ status:
 
 1. 先讀 `10_Projects/目錄.md`。
 2. 執行 `toolbox/project_reminder_scan.py`，用 Python 比對日期與提醒。
-3. 有提醒、逾期或阻塞時，再讀對應專案的 `schedule.md`、`issues.md`。
-4. 需背景時再讀 `decisions.md`、`meetings.md`、`resources.md`。
+3. 有提醒、逾期或阻塞時，先讀對應機種 `目錄.md`，再讀工單的 `schedule.md`、`issues.md`。
+4. 需背景時再讀工單 `decisions.md`、`meetings.md`、`resources.md` 或機種 `common-resources.md`。
 5. AI 負責整理風險、next actions、週報、會議重點或需使用者決策的問題。
 
 ## 工具
@@ -139,7 +142,7 @@ C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
 & 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
-工具掃描 `10_Projects/*/schedule.md` 與 `issues.md`，依 `Target Date`、`Remind On`、`Status` 找提醒與逾期；`done`、`closed`、`cancelled`、`canceled`、`skipped` 不列入；輸出 Markdown report。
+工具遞迴掃描 `10_Projects/**/schedule.md` 與 `issues.md`，依 `Target Date`、`Remind On`、`Status` 找提醒與逾期；`done`、`closed`、`cancelled`、`canceled`、`skipped` 不列入；輸出含機種與工單欄位的 Markdown report。
 
 ## 新資料處理
 

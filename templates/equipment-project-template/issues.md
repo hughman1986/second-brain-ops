@@ -16,7 +16,7 @@ tags:
 - 每個 issue 必須有 owner、next action、target date。
 - 影響裝機時程的 issue 要連回 `schedule.md` 的 stage。
 - `critical` 或 `high` issue 未關閉時，不應進入下一個 stage gate，除非有明確 workaround 與接受者。
-- 超過 `target_date` 未關閉時，狀態改為 `overdue`，並更新專案 dashboard。
+- 超過 `target_date` 未關閉時，狀態改為 `overdue`，並更新機種 dashboard 與 `10_Projects/目錄.md`。
 
 ## Open Issues
 
