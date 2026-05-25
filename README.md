@@ -138,13 +138,13 @@ templates/equipment-project-template/
 掃描未來 7 天提醒與逾期項目：
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
 ```
 
 指定日期與往後天數：
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 常用指令：
@@ -207,28 +207,42 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 
 ## 工具指令
 
-指定 Python：
+文書工具(PDF 抽取、YouTube 字幕、專案提醒)統一在 base 之外的 Python venv `sb-docs` 內執行，這個 venv 專門給第二大腦的文書整理任務使用。
+
+### 一次性建置(只在新環境做一次)
+
+用 base 環境的 Python 建立 venv：
+
+```powershell
+& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp
+```
+
+如果以後 base Python 換位置，請更新上方第一行路徑；如果 venv 換到別的位置，請同步更新本檔與 `AGENTS.md`。
+
+### 指定 Python
 
 ```text
-C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
+C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```
 
-YouTube 字幕擷取：
+### YouTube 字幕擷取
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
 ```
 
-PDF 原始抽取：
+### PDF 原始抽取
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
 ```
 
-專案提醒掃描：
+### 專案提醒掃描
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 工具會自動把 YouTube/PDF 結果放入 `00_Inbox/` 並更新 `00_Inbox/目錄.md`；這些結果仍只是 Capture 階段，需要再依 `CODE` / `PARA` 整理。

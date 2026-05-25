@@ -113,19 +113,29 @@ status:
 
 ## 工具
 
+文書工具(PDF 抽取、YouTube 字幕、專案提醒)統一在 base 之外的 Python venv `sb-docs` 內執行；此 venv 由 base 環境的 Python 建立，不要污染 base。
+
+新環境一次性建置(只做一次)：
+
+```powershell
+& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp
+```
+
 指定 Python：
 
 ```text
-C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
+C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```
+
+如果以後 base Python 換位置，更新上方第一行路徑；如果 venv 換位置，同步更新本檔與 `README.md`。
 
 ### YouTube 字幕
 
 優先使用固定工具，不手寫一次性腳本。
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' -m pip install youtube-transcript-api yt-dlp
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
 ```
 
 工具會用 `yt-dlp` 抓 metadata、`youtube-transcript-api` 抓公開字幕；語言優先 `zh-TW`、`zh-Hant`、`zh`、`en`；輸出到 `00_Inbox/YYYY-MM-DD - slug-transcript.md`；同 source 更新既有檔；成功後更新 `00_Inbox/目錄.md` 為 `captured / needs-review`。字幕不可得時不建空檔、不更新目錄。逐字稿只屬 Capture，整理時再依 CODE/PARA 處理。
@@ -135,8 +145,7 @@ C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
 優先使用固定工具，不手寫一次性腳本。
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' -m pip install pymupdf
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
 ```
 
 工具用 PyMuPDF 抽 metadata、頁數、文字、內嵌圖片；輸出到 `00_Inbox/YYYY-MM-DD - slug-extract.md`；圖片放 `00_Inbox/assets/<pdf-slug>/`；同 source 更新既有檔；成功後更新 `00_Inbox/目錄.md` 為 `captured / needs-review`。此工具只做 raw extraction，不 OCR、不做 AI 視覺解讀、不產生摘要或行動項。
@@ -146,8 +155,8 @@ C:\Users\User\anaconda3\envs\py_3_13_13\python.exe
 處理專案進度、週報、提醒、逾期項目時，必須先讀 `10_Projects/目錄.md`，再執行：
 
 ```powershell
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py
-& 'C:\Users\User\anaconda3\envs\py_3_13_13\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 工具遞迴掃描 `10_Projects/**/schedule.md` 與 `issues.md`，依 `Target Date`、`Remind On`、`Status` 找提醒與逾期；`done`、`closed`、`cancelled`、`canceled`、`skipped` 不列入；輸出含機種與工單欄位的 Markdown report。
