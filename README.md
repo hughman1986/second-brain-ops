@@ -25,7 +25,7 @@
 40_Archives/    已完成、暫停、過期、不活躍但可查找
 90_Outputs/     由筆記轉化出的文章、簡報、memo、SOP、報告等成果
 templates/       可複製的專案與筆記模板
-toolbox/         YouTube、PDF、專案提醒等輔助工具
+toolbox/         YouTube、PDF、PPTX、Word、專案提醒等輔助工具
 ```
 
 每個主要資料夾都有 `目錄.md`。找資料時先看目錄，再讀完整筆記；新增、更新、移動或封存筆記後，也要同步更新目錄。
@@ -215,7 +215,7 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 
 ```powershell
 & 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx pywin32
 ```
 
 如果以後 base Python 換位置，請更新上方第一行路徑；如果 venv 換到別的位置，請同步更新本檔與 `AGENTS.md`。
@@ -237,6 +237,22 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```powershell
 & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
 ```
+
+### PPTX 投影片抽取
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
+```
+
+逐張投影片抽出文字、表格、講者備忘稿，圖片放到 `<out_dir>/assets/<pptx-stem>/`，並輸出 `<pptx-stem>_extract.md`。比 PDF 轉檔失真度低很多，PPTX 可直接抽原始結構與原解析度圖片。與 PDF/YouTube 不同，**out_dir 需手動指定**(通常是 `00_Inbox/` 或對應專案的 `source/`)。
+
+### Word 文件抽取
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
+```
+
+支援 `.docx` (用 `python-docx`,跨平台,首選) 與 `.doc` (用 Word COM 先轉 `.docx`,**需 Windows + Office**)。輸出 markdown 含標題層級、表格 (合併儲存格已自動去重避免 token 浪費)、內嵌圖片到 `<out_dir>/assets/<stem>/`。**out_dir 需手動指定**。
 
 ### 專案提醒掃描
 

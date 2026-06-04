@@ -119,7 +119,7 @@ status:
 
 ```powershell
 & 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx pywin32
 ```
 
 指定 Python：
@@ -149,6 +149,26 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```
 
 工具用 PyMuPDF 抽 metadata、頁數、文字、內嵌圖片；輸出到 `00_Inbox/YYYY-MM-DD - slug-extract.md`；圖片放 `00_Inbox/assets/<pdf-slug>/`；同 source 更新既有檔；成功後更新 `00_Inbox/目錄.md` 為 `captured / needs-review`。此工具只做 raw extraction，不 OCR、不做 AI 視覺解讀、不產生摘要或行動項。
+
+### PPTX 抽取
+
+優先使用固定工具，不手寫一次性腳本。PPTX 原生格式失真度遠低於 PDF 轉檔(結構、表格、講者備忘稿、原解析度圖片皆可保留)，若同時有 PPTX 和 PDF 一律優先用 PPTX。
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
+```
+
+工具用 `python-pptx` 逐張投影片抽文字、表格、講者備忘稿，處理 group shapes (recursive) 與內嵌圖片；輸出 `<out_dir>/<pptx-stem>_extract.md` + `<out_dir>/assets/<pptx-stem>/slideXX_N.<ext>`。與 PDF/YouTube 工具不同，**out_dir 需手動指定**(通常是 `00_Inbox/` 或對應專案的 `source/`)，工具不自動更新 `00_Inbox/目錄.md`。此工具只做 raw extraction，不做 AI 視覺解讀、不產生摘要或行動項。
+
+### Word 抽取
+
+優先使用固定工具，不手寫一次性腳本(也不要再用「Word COM SaveAs 純文字 + Big5 重編碼」舊 pattern,本工具已涵蓋且輸出乾淨 markdown)。
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
+```
+
+自動依副檔名分流:`.docx` 用 `python-docx` 直接解析(跨平台、首選);`.doc` 透過 Word COM (`pywin32`,**需 Windows + Office**) 轉成暫存 `.docx` 再解析。輸出 `<out_dir>/<stem>_extract.md`,包含 Heading 1~6 層級、表格(已處理 horizontal/vertical merged cells 去重,避免合併儲存格內容重複 N 倍 token 浪費)、行內圖片放 `<out_dir>/assets/<stem>/imgN.<ext>`。預設跳過頁首/頁尾避免重複頁碼雜訊。**out_dir 需手動指定**,工具不自動更新 `00_Inbox/目錄.md`。
 
 ### 專案提醒
 
