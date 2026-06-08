@@ -111,6 +111,23 @@ status:
 4. 需背景時再讀工單 `decisions.md`、`meetings.md`、`resources.md` 或機種 `common-resources.md`。
 5. AI 負責整理風險、next actions、週報、會議重點或需使用者決策的問題。
 
+## Skill 索引
+
+固定流程與規範已展開為獨立 skill，集中放在 `toolbox/skills/`。遇到對應觸發情境時，AI 應直接遵循該 skill 而不重新推導：
+
+| Skill | 何時用 |
+|---|---|
+| `safe-commit` | 任何 git commit / push / PR 動作 |
+| `project-reminder-scan` | 專案進度、週報、提醒、逾期查詢 |
+| `equipment-new-work-order` | 建立新機種或新工單 |
+| `stage-gate-check` | 設備裝機 stage gate 判斷 |
+| `capture-youtube` / `capture-pdf` / `capture-pptx` / `capture-word` | 對應素材的 raw capture |
+| `code-distill-note` | CODE 流程整理筆記 |
+| `para-classify` | PARA 分類判斷 |
+| `toc-sync` | 任何 PARA 資料夾內容變動後同步 `目錄.md` |
+
+詳見 `toolbox/skills/README.md`。本檔（`AGENTS.md`）保留全域工作規範與心法，skill 是具體可執行流程；規則衝突時以本檔為準。
+
 ## 工具
 
 文書工具(PDF 抽取、YouTube 字幕、專案提醒)統一在 base 之外的 Python venv `sb-docs` 內執行；此 venv 由 base 環境的 Python 建立，不要污染 base。
