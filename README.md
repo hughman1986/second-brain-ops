@@ -44,19 +44,25 @@
 & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
 ```
 
-**(b) 安裝 skills 到 Copilot CLI** — skill 是給 AI agent 看的固定流程說明。Copilot CLI 從 `~/.copilot/skills/<skill-name>/SKILL.md` 讀取，所以一鍵把本 repo 的 `toolbox/skills/*.md` 部署過去：
+**(b) 安裝 skills 到 AI agent** — skill 是給 AI agent 看的固定流程說明，本 repo 把所有 skill 維護在 `toolbox/skills/*.md`。**初次使用直接對 AI 下這個 prompt 即可**：
 
-```powershell
-$src = 'D:\00_PM的第二大腦\second-brain-ops\toolbox\skills'
-$dst = "$env:USERPROFILE\.copilot\skills"
-Get-ChildItem $src -Filter '*.md' | Where-Object Name -ne 'README.md' | ForEach-Object {
-    $name = $_.BaseName
-    New-Item -ItemType Directory -Path "$dst\$name" -Force | Out-Null
-    Copy-Item $_.FullName "$dst\$name\SKILL.md" -Force
-}
+```text
+請根據 toolbox/skills/ 資料夾下的所有 *.md (排除 README.md)，幫我安裝到本機 AI agent 的 skills 目錄。Copilot CLI 請部署成 ~/.copilot/skills/<skill-name>/SKILL.md；其他 agent (Claude Code / Cursor / Cline 等) 請依各自規範安裝。安裝完請列出已掛載的 skill 清單。
 ```
 
-> 之後 repo 若新增/更新 skill,重跑上面那段就會同步。其他 AI agent (Claude Code / Cursor / Cline 等) 也可以用對應的 skill 安裝方式,或直接把 `toolbox/skills/` 加進 prompt 上下文。
+> 之後 repo 若新增/更新 skill，再對 AI 說一次「請同步 toolbox/skills/ 到本機 skill 目錄」即可。
+>
+> 想自己跑也可以,以 Copilot CLI 為例：
+>
+> ```powershell
+> $src = 'D:\00_PM的第二大腦\second-brain-ops\toolbox\skills'
+> $dst = "$env:USERPROFILE\.copilot\skills"
+> Get-ChildItem $src -Filter '*.md' | Where-Object Name -ne 'README.md' | ForEach-Object {
+>     $name = $_.BaseName
+>     New-Item -ItemType Directory -Path "$dst\$name" -Force | Out-Null
+>     Copy-Item $_.FullName "$dst\$name\SKILL.md" -Force
+> }
+> ```
 >
 > 安裝完成後在 Copilot CLI 用 `/skills` 確認已掛載；用 `/env` 看完整載入狀態。
 
