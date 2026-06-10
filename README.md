@@ -8,6 +8,87 @@
 - `PARA`：Projects、Areas、Resources、Archives
 - `Progressive Summarization`：逐層萃取重點，讓筆記未來可重用
 
+## 快速上手
+
+### 0. 一次性建立 sb-docs venv (新環境才需要)
+
+```powershell
+& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
+```
+
+### 1. 把素材抽進筆記 (Capture)
+
+```powershell
+# YouTube 字幕 → 00_Inbox/
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+
+# PDF → 00_Inbox/ (含圖片)
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+
+# PPTX → 指定資料夾 (00_Inbox/ 或 10_Projects/<...>/source/)
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
+
+# Word (.docx/.doc) → 指定資料夾
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx>" "<out_dir>"
+
+# Excel (.xlsx/.xlsm/.xls) → 指定資料夾 (廠商回填表/BOM/排程一律用這個,不要先轉 PDF)
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx>" "<out_dir>"
+
+# Outlook 信件 → 預設 00_Inbox/ (常見三種選信方式)
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --folder "收件匣\01_行政單位\PM" --subject "交期異動" --since 2026-05-01
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --entry-id "<EntryID>"
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id "<ConvID>"
+```
+
+### 2. 整理 Inbox / 把素材升級成知識資產
+
+對 AI 直接下指令 (AI 會依 `AGENTS.md` 走 CODE / PARA 流程):
+
+```text
+請依照 AGENTS.md，用 CODE 和 PARA 整理 00_Inbox 裡的新資料。
+```
+
+```text
+請把這份筆記做 Progressive Summarization，補上 Summary、Key Ideas、Distilled Points、Action Items、Possible Outputs。
+```
+
+```text
+請檢查這份筆記應該屬於 Project、Area、Resource 還是 Archive，並說明理由。
+```
+
+### 3. 跑專案提醒掃描 (週報 / 逾期追蹤)
+
+```powershell
+# 未來 7 天提醒 + 逾期
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
+
+# 指定基準日與往後天數
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+```
+
+搭配 AI 指令：
+
+```text
+請先讀 10_Projects/目錄.md，再執行 project_reminder_scan.py，整理目前需要注意的專案提醒、逾期項目與 next actions。
+```
+
+### 4. 新增設備機種 / 工單
+
+```text
+請用 templates/equipment-model-template 建立新機種 <machine-model>，或用 templates/equipment-project-template 建立工單 <work-order-id>，並同步更新機種目錄與 10_Projects/目錄.md。
+```
+
+詳見下方 [設備專案快速建立](#設備專案快速建立) 段落。
+
+### 5. AI 查資料時要先讀目錄
+
+```text
+請先讀各資料夾的目錄.md，再找與這個問題相關的筆記，不要一開始就讀全部全文。
+```
+
+---
+
 ## 這個資料夾用來做什麼
 
 - 保存新資料、想法、會議紀錄、研究素材。
