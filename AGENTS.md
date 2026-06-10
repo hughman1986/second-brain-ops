@@ -83,6 +83,31 @@ status:
 - 預設使用標準 Markdown 連結；不依賴 Obsidian 語法。
 - 若使用 wikilinks 也要讓知識庫仍可用一般 Markdown 閱讀。
 
+## 原始素材保存 (source/ 慣例)
+
+capture-* 工具預設把 raw extract、原始檔、assets 放到 `00_Inbox/`，那只是 Capture 階段的暫存位置。經過 Organize / Distill 後 (`code-distill-note` 流程)，必須把整組原始素材搬到該筆記所屬資料夾的 `source/` 子資料夾，與 distilled 筆記放在一起。
+
+標準結構 (適用於 `10_Projects/<...>/`、`30_Resources/<...>/`、`20_Areas/<...>/` 等)：
+
+```text
+<owner-folder>/
+├── 目錄.md
+├── <distilled-note>.md            ← 整理後的主筆記
+├── (其他 project / resource 檔)
+└── source/
+    ├── <原始檔>.pdf / .pptx / .docx / .odt / .md / ...
+    ├── <YYYY-MM-DD - slug-extract>.md   ← capture-* 抽取的 raw extract
+    └── assets/<pdf-slug 或 pptx-stem>/   ← 抽取的圖片、附件
+```
+
+操作要點：
+
+- 搬移時 raw extract md 內的 `source:` 路徑與「## Source」段落要一併更新為新位置。
+- 圖片相對路徑必須維持 `assets/<slug>/...`，不要攤平到 `assets/` 根目錄；若 `Move-Item` 攤平了要重新巢狀化。
+- 搬移後立即更新原 `00_Inbox/目錄.md`「已整理出去的資料」歷史紀錄，並在新位置 `目錄.md` 加 `## Source` 區段列出 PDF / extract / assets 路徑。
+- distilled 筆記的 frontmatter `source:` 與「## Related Notes」連結都要指向新的 `source/` 路徑。
+- 既有範例：`10_Projects/striper-grinder/source/`、`10_Projects/cmp-digital-twin/source/`、`10_Projects/gsvw-s306/source/`、`30_Resources/tsmc-specs/source/`。
+
 ## 版本控制與 commit 規範
 
 - 為避免機密外洩，commit 只能包含規範、模板、工具程式或明確可公開的設定檔；預設只提交本規範相關變更。
@@ -121,7 +146,7 @@ status:
 | `project-reminder-scan` | 專案進度、週報、提醒、逾期查詢 |
 | `equipment-new-work-order` | 建立新機種或新工單 |
 | `stage-gate-check` | 設備裝機 stage gate 判斷 |
-| `capture-youtube` / `capture-pdf` / `capture-pptx` / `capture-word` | 對應素材的 raw capture |
+| `capture-youtube` / `capture-pdf` / `capture-pptx` / `capture-word` / `capture-excel` / `capture-outlook` | 對應素材的 raw capture |
 | `code-distill-note` | CODE 流程整理筆記 |
 | `para-classify` | PARA 分類判斷 |
 | `toc-sync` | 任何 PARA 資料夾內容變動後同步 `目錄.md` |
@@ -136,7 +161,7 @@ status:
 
 ```powershell
 & 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx pywin32
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl pywin32 html2text
 ```
 
 指定 Python：
@@ -186,6 +211,33 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```
 
 自動依副檔名分流:`.docx` 用 `python-docx` 直接解析(跨平台、首選);`.doc` 透過 Word COM (`pywin32`,**需 Windows + Office**) 轉成暫存 `.docx` 再解析。輸出 `<out_dir>/<stem>_extract.md`,包含 Heading 1~6 層級、表格(已處理 horizontal/vertical merged cells 去重,避免合併儲存格內容重複 N 倍 token 浪費)、行內圖片放 `<out_dir>/assets/<stem>/imgN.<ext>`。預設跳過頁首/頁尾避免重複頁碼雜訊。**out_dir 需手動指定**,工具不自動更新 `00_Inbox/目錄.md`。
+
+### Excel 抽取
+
+優先使用固定工具，不手寫一次性腳本。Excel 內容(尤其是廠商回填表、規格 checklist、BOM、排程表)在轉成 PDF 或 CSV 後通常會失去欄位對齊、合併儲存格、隱藏工作表等資訊，請一律優先用本工具。
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
+```
+
+自動依副檔名分流:`.xlsx` / `.xlsm` 用 `openpyxl` 直接解析(跨平台、首選,以 `data_only=True` 取得公式快取值);`.xls` 透過 Excel COM (`pywin32`,**需 Windows + Office**) 轉成暫存 `.xlsx` 再解析。輸出 `<out_dir>/<stem>_extract.md`,內含工作表總覽 (名稱 / used range / visible/hidden) 與每張工作表的 Markdown 表格 (第一欄是原 Excel 列號,欄頭是 Excel 欄字母 A/B/...,合併儲存格的非錨點位置會留白以維持欄位對齊);內嵌圖片放 `<out_dir>/assets/<stem>/sheetXX_N.<ext>`。**out_dir 需手動指定**,工具不自動更新 `00_Inbox/目錄.md`。此工具只做 raw extraction,不解圖表 (charts)、不做 AI 視覺解讀、不產生摘要或行動項。
+
+### Outlook 信件抽取
+
+優先使用固定工具，不手寫一次性腳本。連本機已登入的 Outlook（`win32com.client`，需 Windows + Office），可依資料夾 + 過濾條件批次抓，也可用 EntryID / ConversationID 精準抓單封或整串 thread。
+
+```powershell
+# 預設抓進 00_Inbox/，同步更新目錄.md
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --from "boss@company.com" --subject "review"
+
+# 抓進專案 source/（跳過 Inbox 流程）
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id <ID> --slug cmp-customer --out-dir 10_Projects/cmp-digital-twin/source
+
+# 列出符合條件但不寫檔
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --limit 20 --dry-run
+```
+
+行為：用 `Outlook.Application` COM 連線；支援 `--folder`（巢狀 `Inbox/Sub/Sub2`）、`--store`、`--since/--until`、`--from`（可重複）、`--subject`（可重複）、`--unread`、`--entry-id`（可重複）、`--conversation-id`、`--limit`、`--html`（HTMLBody 經 `html2text` 轉 markdown）、`--no-attachments`、`--out-dir`、`--dry-run`。輸出單一 Markdown 把多封信合併成 thread，每封含 metadata 表（From/To/Cc/Received/Folder/Importance/Categories/EntryID/ConversationID）+ body + 附件清單；附件 / 嵌入圖存到 `<out_dir>/assets/<slug>/`。預設輸出到 `00_Inbox/YYYY-MM-DD - <slug>-mail.md` 並更新 `00_Inbox/目錄.md` 為 `captured / needs-review`；`--out-dir` 指定其他位置時不動 Inbox 目錄（依 toc-sync 自行更新該資料夾目錄）。此工具只做 raw extraction，不做 AI 摘要 / 行動項；**不修改 Outlook 內容**（不標已讀、不移動、不寄信）。
 
 ### 專案提醒
 

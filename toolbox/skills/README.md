@@ -32,6 +32,8 @@ related:
 | P2 | [capture-pdf](capture-pdf.md) | PDF 原始抽取到 Inbox |
 | P2 | [capture-pptx](capture-pptx.md) | PPTX 投影片抽取 |
 | P2 | [capture-word](capture-word.md) | Word 文件抽取 |
+| P2 | [capture-excel](capture-excel.md) | Excel 試算表抽取 |
+| P2 | [capture-outlook](capture-outlook.md) | Outlook 信件 / thread 抽取 |
 | P3 | [code-distill-note](code-distill-note.md) | CODE 流程整理筆記 |
 | P3 | [para-classify](para-classify.md) | PARA 分類判斷 |
 | P3 | [toc-sync](toc-sync.md) | 同步更新資料夾 `目錄.md` |
