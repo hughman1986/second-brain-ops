@@ -10,6 +10,31 @@
 
 ## 快速上手
 
+### 前置：Python 環境安裝建議
+
+工具鏈需要一個獨立的 Python venv (`sb-docs`),避免污染系統/base Python。
+
+**Base Python (擇一)**:
+
+- **推薦 Miniconda** (Windows 上方便管理多版本)：[下載 Miniconda](https://www.anaconda.com/download/success)，安裝到使用者目錄 (預設 `C:\Users\<you>\AppData\Local\miniconda3`)。
+- 或 [python.org](https://www.python.org/downloads/windows/) 安裝任一 Python **3.10+** (建議 3.11/3.12)，安裝時勾選「Add Python to PATH」。
+
+**環境需求**:
+
+| 工具 | 必要套件 | 平台需求 |
+| --- | --- | --- |
+| PDF (`pdf_extract_to_inbox.py`) | `pymupdf` | 任何平台 |
+| YouTube (`youtube_transcript_to_inbox.py`) | `youtube-transcript-api`, `yt-dlp` | 任何平台 |
+| PPTX (`pptx_extract.py`) | `python-pptx` | 任何平台 |
+| Word `.docx` (`word_extract.py`) | `python-docx` | 任何平台 |
+| Word `.doc` (舊版) | `python-docx`, `pywin32` | **Windows + 已安裝 Office** |
+| Excel `.xlsx/.xlsm` (`xlsx_extract.py`) | `openpyxl` | 任何平台 |
+| Excel `.xls` (舊版) | `openpyxl`, `pywin32` | **Windows + 已安裝 Office** |
+| Outlook (`outlook_extract_to_inbox.py`) | `pywin32`, `html2text` | **Windows + 已登入 Outlook (Desktop)** |
+| 專案提醒 (`project_reminder_scan.py`) | (僅標準函式庫) | 任何平台 |
+
+> 完全用不到 Office/Outlook 的話 (例如純 macOS/Linux),可以不裝 `pywin32`,但對應的 Outlook 抽取與舊版 `.doc/.xls` 處理會無法使用。
+
 ### 0. 一次性建立 sb-docs venv (新環境才需要)
 
 ```powershell
