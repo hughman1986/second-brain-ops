@@ -35,40 +35,47 @@
 
 > 完全用不到 Office/Outlook 的話 (例如純 macOS/Linux),可以不裝 `pywin32`,但對應的 Outlook 抽取與舊版 `.doc/.xls` 處理會無法使用。
 
-### 0. 一次性建立 sb-docs venv (新環境才需要)
+### 0. 一次性安裝：venv + 註冊 skills
+
+**(a) 建立 sb-docs venv** (工具實際運算還是用 Python，由 AI agent 在背後呼叫)：
 
 ```powershell
 & 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
 & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
 ```
 
-### 1. 把素材抽進筆記 (Capture)
+**(b) 安裝 skills 到 Copilot CLI** — skill 是給 AI agent 看的固定流程說明。Copilot CLI 從 `~/.copilot/skills/<skill-name>/SKILL.md` 讀取，所以一鍵把本 repo 的 `toolbox/skills/*.md` 部署過去：
 
 ```powershell
-# YouTube 字幕 → 00_Inbox/
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
-
-# PDF → 00_Inbox/ (含圖片)
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
-
-# PPTX → 指定資料夾 (00_Inbox/ 或 10_Projects/<...>/source/)
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
-
-# Word (.docx/.doc) → 指定資料夾
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx>" "<out_dir>"
-
-# Excel (.xlsx/.xlsm/.xls) → 指定資料夾 (廠商回填表/BOM/排程一律用這個,不要先轉 PDF)
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx>" "<out_dir>"
-
-# Outlook 信件 → 預設 00_Inbox/ (常見三種選信方式)
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --folder "收件匣\01_行政單位\PM" --subject "交期異動" --since 2026-05-01
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --entry-id "<EntryID>"
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id "<ConvID>"
+$src = 'D:\00_PM的第二大腦\second-brain-ops\toolbox\skills'
+$dst = "$env:USERPROFILE\.copilot\skills"
+Get-ChildItem $src -Filter '*.md' | Where-Object Name -ne 'README.md' | ForEach-Object {
+    $name = $_.BaseName
+    New-Item -ItemType Directory -Path "$dst\$name" -Force | Out-Null
+    Copy-Item $_.FullName "$dst\$name\SKILL.md" -Force
+}
 ```
 
-### 2. 整理 Inbox / 把素材升級成知識資產
+> 之後 repo 若新增/更新 skill,重跑上面那段就會同步。其他 AI agent (Claude Code / Cursor / Cline 等) 也可以用對應的 skill 安裝方式,或直接把 `toolbox/skills/` 加進 prompt 上下文。
+>
+> 安裝完成後在 Copilot CLI 用 `/skills` 確認已掛載；用 `/env` 看完整載入狀態。
 
-對 AI 直接下指令 (AI 會依 `AGENTS.md` 走 CODE / PARA 流程):
+### 1. 把素材抽進筆記 (Capture) — 直接對 AI 下 prompt
+
+安裝 skill 後,以下情境 AI 會自動呼叫對應 capture skill (背後跑 `toolbox/` 工具),不必記憶指令參數：
+
+| 來源 | 對 AI 說 |
+| --- | --- |
+| YouTube | `把這部影片放進 second brain：<youtube-url>` |
+| PDF | `這份 PDF 幫我抽進 Inbox：<pdf-path>` |
+| PPTX | `這份簡報抽到 <out_dir>：<src.pptx>` (專案素材通常 `10_Projects/<...>/source/`) |
+| Word | `這份 Word 文件抽到 <out_dir>：<src.docx>` |
+| Excel | `這份 Excel 抽到 <out_dir>：<src.xlsx>` (廠商回填表/BOM/排程一律用,不要先轉 PDF) |
+| Outlook 信件 | `從 Outlook 「<資料夾路徑>」找主旨含「<關鍵字>」、寄件人是 <某人>、5/1 之後的信，抽到 <out_dir>` |
+
+對應 skill：`capture-youtube` / `capture-pdf` / `capture-pptx` / `capture-word` / `capture-excel` / `capture-outlook`。
+
+### 2. 整理 Inbox / 把素材升級成知識資產
 
 ```text
 請依照 AGENTS.md，用 CODE 和 PARA 整理 00_Inbox 裡的新資料。
@@ -82,35 +89,43 @@
 請檢查這份筆記應該屬於 Project、Area、Resource 還是 Archive，並說明理由。
 ```
 
+對應 skill：`code-distill-note` / `para-classify` / `toc-sync` (整理完會自動同步目錄)。
+
 ### 3. 跑專案提醒掃描 (週報 / 逾期追蹤)
 
-```powershell
-# 未來 7 天提醒 + 逾期
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
-
-# 指定基準日與往後天數
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+```text
+請先讀 10_Projects/目錄.md，再掃描未來 7 天的專案提醒與逾期項目，整理出 next actions。
 ```
-
-搭配 AI 指令：
 
 ```text
-請先讀 10_Projects/目錄.md，再執行 project_reminder_scan.py，整理目前需要注意的專案提醒、逾期項目與 next actions。
+請以 2026-05-23 為基準日，掃描未來 14 天的提醒與逾期項目。
 ```
+
+對應 skill：`project-reminder-scan` (背後呼叫 `project_reminder_scan.py`)。
 
 ### 4. 新增設備機種 / 工單
 
 ```text
-請用 templates/equipment-model-template 建立新機種 <machine-model>，或用 templates/equipment-project-template 建立工單 <work-order-id>，並同步更新機種目錄與 10_Projects/目錄.md。
+請建立新機種 <machine-model>，並用 templates/equipment-model-template。
 ```
 
-詳見下方 [設備專案快速建立](#設備專案快速建立) 段落。
+```text
+請在 <machine-model> 下建立新工單 <work-order-id>，並同步更新機種目錄與 10_Projects/目錄.md。
+```
 
-### 5. AI 查資料時要先讀目錄
+對應 skill：`equipment-new-work-order`。詳見下方 [設備專案快速建立](#設備專案快速建立) 段落。
+
+### 5. AI 查資料 / commit 規範
 
 ```text
 請先讀各資料夾的目錄.md，再找與這個問題相關的筆記，不要一開始就讀全部全文。
 ```
+
+```text
+請 commit 我剛改的規範檔。
+```
+
+對應 skill：`safe-commit` (commit / push 前自動跑機密外洩防護檢查,禁止把知識庫內容推上去)。
 
 ---
 
