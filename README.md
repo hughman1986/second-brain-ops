@@ -12,37 +12,22 @@
 
 ### 前置：Python 環境安裝建議
 
-工具鏈需要一個獨立的 Python venv (`sb-docs`),避免污染系統/base Python。
+只需安裝 base Python，其餘 venv 與套件由 AI agent 依 `AGENTS.md` 自動補完。
 
-**Base Python (擇一)**:
+- **推薦 Miniconda** (Windows 上方便管理多版本)：[下載](https://www.anaconda.com/download/success)，安裝到使用者目錄。
+- 或 [python.org](https://www.python.org/downloads/windows/) Python **3.10+** (建議 3.11/3.12)，安裝時勾「Add Python to PATH」。
 
-- **推薦 Miniconda** (Windows 上方便管理多版本)：[下載 Miniconda](https://www.anaconda.com/download/success)，安裝到使用者目錄 (預設 `C:\Users\<you>\AppData\Local\miniconda3`)。
-- 或 [python.org](https://www.python.org/downloads/windows/) 安裝任一 Python **3.10+** (建議 3.11/3.12)，安裝時勾選「Add Python to PATH」。
-
-**環境需求**:
-
-| 工具 | 必要套件 | 平台需求 |
-| --- | --- | --- |
-| PDF (`pdf_extract_to_inbox.py`) | `pymupdf` | 任何平台 |
-| YouTube (`youtube_transcript_to_inbox.py`) | `youtube-transcript-api`, `yt-dlp` | 任何平台 |
-| PPTX (`pptx_extract.py`) | `python-pptx` | 任何平台 |
-| Word `.docx` (`word_extract.py`) | `python-docx` | 任何平台 |
-| Word `.doc` (舊版) | `python-docx`, `pywin32` | **Windows + 已安裝 Office** |
-| Excel `.xlsx/.xlsm` (`xlsx_extract.py`) | `openpyxl` | 任何平台 |
-| Excel `.xls` (舊版) | `openpyxl`, `pywin32` | **Windows + 已安裝 Office** |
-| Outlook (`outlook_extract_to_inbox.py`) | `pywin32`, `html2text` | **Windows + 已登入 Outlook (Desktop)** |
-| 專案提醒 (`project_reminder_scan.py`) | (僅標準函式庫) | 任何平台 |
-
-> 完全用不到 Office/Outlook 的話 (例如純 macOS/Linux),可以不裝 `pywin32`,但對應的 Outlook 抽取與舊版 `.doc/.xls` 處理會無法使用。
+> macOS / Linux 也可以，但 Outlook、舊版 `.doc/.xls` 抽取需要 Windows + Office (`pywin32`)。
 
 ### 0. 一次性安裝：venv + 註冊 skills
 
-**(a) 建立 sb-docs venv** (工具實際運算還是用 Python，由 AI agent 在背後呼叫)：
+**(a) 建立 sb-docs venv + 安裝套件** — 直接對 AI 下這個 prompt：
 
-```powershell
-& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
+```text
+請依 AGENTS.md「工具」章節，建立 sb-docs venv 並安裝所有需要的套件 (pymupdf, youtube-transcript-api, yt-dlp, python-pptx, python-docx, openpyxl, html2text, pywin32)。完成後驗證可用。
 ```
+
+> AI 會用本機已安裝的 Python (Miniconda / python.org) 建 venv 到 `C:\Users\<you>\.venvs\sb-docs`，並 `pip install` 全部套件。
 
 **(b) 安裝 skills 到 AI agent** — skill 是給 AI agent 看的固定流程說明，本 repo 把所有 skill 維護在 `toolbox/skills/*.md`。**初次使用直接對 AI 下這個 prompt 即可**：
 
