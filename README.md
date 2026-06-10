@@ -25,7 +25,7 @@
 40_Archives/    已完成、暫停、過期、不活躍但可查找
 90_Outputs/     由筆記轉化出的文章、簡報、memo、SOP、報告等成果
 templates/       可複製的專案與筆記模板
-toolbox/         YouTube、PDF、PPTX、Word、專案提醒等輔助工具
+toolbox/         YouTube、PDF、PPTX、Word、Excel、Outlook、專案提醒等輔助工具
 ```
 
 每個主要資料夾都有 `目錄.md`。找資料時先看目錄，再讀完整筆記；新增、更新、移動或封存筆記後，也要同步更新目錄。
@@ -207,7 +207,7 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 
 ## 工具指令
 
-文書工具(PDF 抽取、YouTube 字幕、專案提醒)統一在 base 之外的 Python venv `sb-docs` 內執行，這個 venv 專門給第二大腦的文書整理任務使用。
+文書工具(PDF / YouTube / PPTX / Word / Excel / Outlook 抽取、專案提醒)統一在 base 之外的 Python venv `sb-docs` 內執行，這個 venv 專門給第二大腦的文書整理任務使用。
 
 ### 一次性建置(只在新環境做一次)
 
@@ -215,7 +215,7 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 
 ```powershell
 & 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx pywin32
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
 ```
 
 如果以後 base Python 換位置，請更新上方第一行路徑；如果 venv 換到別的位置，請同步更新本檔與 `AGENTS.md`。
@@ -253,6 +253,29 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ```
 
 支援 `.docx` (用 `python-docx`,跨平台,首選) 與 `.doc` (用 Word COM 先轉 `.docx`,**需 Windows + Office**)。輸出 markdown 含標題層級、表格 (合併儲存格已自動去重避免 token 浪費)、內嵌圖片到 `<out_dir>/assets/<stem>/`。**out_dir 需手動指定**。
+
+### Excel 表單抽取
+
+```powershell
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
+```
+
+支援 `.xlsx` / `.xlsm` (用 `openpyxl`,跨平台,首選,以 `data_only=True` 取公式快取值) 與 `.xls` (用 Excel COM 先轉 `.xlsx`,**需 Windows + Office**)。輸出 markdown 含工作表總覽 + 每張工作表的對齊表格 (第一欄是 Excel 原列號,欄頭是 Excel 欄字母,合併儲存格非錨點留白以維持欄位對齊),內嵌圖片放 `<out_dir>/assets/<stem>/`。**out_dir 需手動指定**。Excel 內容 (廠商回填表、規格 checklist、BOM、排程表) 一律優先用本工具而不要先轉 PDF/CSV,以免失去欄位對齊、合併儲存格與隱藏工作表資訊。
+
+### Outlook 信件抽取
+
+```powershell
+# 依資料夾 + filter 搜尋
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --folder "收件匣\01_行政單位\PM" --subject "交期異動" --since 2026-05-01
+
+# 依 EntryID 抽單封
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --entry-id "<EntryID>"
+
+# 依 ConversationID 抽整串對話
+& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id "<ConvID>"
+```
+
+用本機 Outlook COM (`pywin32`) + `html2text` 抽信件 metadata、body、附件,**需 Windows + 已登入的 Outlook**。多封信合併成單檔 markdown,附件存到 `assets/<slug>/`。預設輸出到 `00_Inbox/`,可用 `--out-dir` 指定 (整理到專案時通常指向 `10_Projects/<...>/source/`)。常用旗標：`--dry-run` 只列符合的信不抽取、`--html` 保留 HTML body 而非轉 markdown、`--no-attachments` 跳過附件。
 
 ### 專案提醒掃描
 
