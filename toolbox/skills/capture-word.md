@@ -27,7 +27,7 @@ related:
    - 專案素材 → `10_Projects/<machine-model>/<work-order-id>/source/`
 2. **執行工具**：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
    ```
 3. 工具行為：
    - `.docx` → 用 `python-docx` 直接解析（跨平台、首選）

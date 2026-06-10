@@ -27,7 +27,7 @@ related:
 
 1. **執行工具**（優先使用固定工具，不手寫一次性腳本）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/pdf_extract_to_inbox.py "<pdf-path>"
    ```
 2. 工具行為：
    - 用 PyMuPDF 抽 metadata、頁數、文字、內嵌圖片

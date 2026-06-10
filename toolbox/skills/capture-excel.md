@@ -28,7 +28,7 @@ related:
    - 專案素材 → `10_Projects/<machine-model>/<work-order-id>/source/`
 2. **執行工具**：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
    ```
 3. 工具行為：
    - `.xlsx` / `.xlsm` → 用 `openpyxl` 直接解析（跨平台、首選，`data_only=True` 取得公式快取值）

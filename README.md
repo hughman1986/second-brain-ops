@@ -10,16 +10,32 @@
 
 ## 快速上手
 
-### 前置：Python 環境安裝建議
+### 第一次拿到這份 repo (Onboarding)
 
-只需安裝 base Python，其餘 venv 與套件由 AI agent 依 `AGENTS.md` 自動補完。
+新使用者只需做三件事，其餘由 AI agent 補完：
 
-- **推薦 Miniconda** (Windows 上方便管理多版本)：[下載](https://www.anaconda.com/download/success)，安裝到使用者目錄。
-- 或 [python.org](https://www.python.org/downloads/windows/) Python **3.10+** (建議 3.11/3.12)，安裝時勾「Add Python to PATH」。
+1. **Clone repo**
+   ```powershell
+   git clone <this-repo-url>
+   cd <repo-folder>
+   ```
+2. **安裝 base Python** (擇一)
+   - 推薦 [Miniconda](https://www.anaconda.com/download/success) (Windows 上方便管理多版本)
+   - 或 [python.org](https://www.python.org/downloads/windows/) Python **3.10+** (建議 3.11/3.12)，安裝時勾「Add Python to PATH」
+3. **打開 AI agent (Copilot CLI / Claude Code / Cursor 等)，下這條總 prompt**
+   ```text
+   我第一次拿到這份 repo，請依 AGENTS.md 與 README.md「快速上手」幫我完成初始化：
+   (1) 用本機 Python 建立 sb-docs venv (預設 ~/.venvs/sb-docs)，並安裝所有套件
+       (pymupdf, youtube-transcript-api, yt-dlp, python-pptx, python-docx,
+        openpyxl, html2text, pywin32);
+   (2) 把 toolbox/skills/ 內所有 *.md (排除 README.md) 安裝到本機 AI agent 的
+       skills 目錄 (Copilot CLI: ~/.copilot/skills/<name>/SKILL.md);
+   (3) 完成後執行一次 toolbox/project_reminder_scan.py 驗證可用，並回報已掛載的 skill 清單。
+   ```
 
-> macOS / Linux 也可以，但 Outlook、舊版 `.doc/.xls` 抽取需要 Windows + Office (`pywin32`)。
+> macOS / Linux 也可以，但 Outlook 抽取與舊版 `.doc/.xls` 需要 Windows + Office (`pywin32`),其餘工具跨平台。
 
-### 0. 一次性安裝：venv + 註冊 skills
+### 0. 細項 — venv + skills 個別操作 (上面 onboarding prompt 已涵蓋)
 
 **(a) 建立 sb-docs venv + 安裝套件** — 直接對 AI 下這個 prompt：
 
@@ -27,7 +43,7 @@
 請依 AGENTS.md「工具」章節，建立 sb-docs venv 並安裝所有需要的套件 (pymupdf, youtube-transcript-api, yt-dlp, python-pptx, python-docx, openpyxl, html2text, pywin32)。完成後驗證可用。
 ```
 
-> AI 會用本機已安裝的 Python (Miniconda / python.org) 建 venv 到 `C:\Users\<you>\.venvs\sb-docs`，並 `pip install` 全部套件。
+> AI 會用本機已安裝的 Python (Miniconda / python.org) 建 venv 到 `~\.venvs\sb-docs` (`$env:USERPROFILE\.venvs\sb-docs`)，並 `pip install` 全部套件。
 
 **(b) 安裝 skills 到 AI agent** — skill 是給 AI agent 看的固定流程說明，本 repo 把所有 skill 維護在 `toolbox/skills/*.md`。**初次使用直接對 AI 下這個 prompt 即可**：
 
@@ -40,7 +56,7 @@
 > 想自己跑也可以,以 Copilot CLI 為例：
 >
 > ```powershell
-> $src = 'D:\00_PM的第二大腦\second-brain-ops\toolbox\skills'
+> $src = Join-Path $PWD 'toolbox\skills'   # 在 repo root 執行
 > $dst = "$env:USERPROFILE\.copilot\skills"
 > Get-ChildItem $src -Filter '*.md' | Where-Object Name -ne 'README.md' | ForEach-Object {
 >     $name = $_.BaseName
@@ -250,13 +266,13 @@ templates/equipment-project-template/
 掃描未來 7 天提醒與逾期項目：
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py
 ```
 
 指定日期與往後天數：
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 常用指令：
@@ -326,8 +342,8 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 用 base 環境的 Python 建立 venv：
 
 ```powershell
-& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
+python -m venv "$env:USERPROFILE\.venvs\sb-docs"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl html2text pywin32
 ```
 
 如果以後 base Python 換位置，請更新上方第一行路徑；如果 venv 換到別的位置，請同步更新本檔與 `AGENTS.md`。
@@ -335,25 +351,25 @@ AI agent 編輯或產生筆記、目錄、工具輸出時，也要確保寫入 U
 ### 指定 Python
 
 ```text
-C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
+$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe
 ```
 
 ### YouTube 字幕擷取
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
 ```
 
 ### PDF 原始抽取
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/pdf_extract_to_inbox.py "<pdf-path>"
 ```
 
 ### PPTX 投影片抽取
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
 ```
 
 逐張投影片抽出文字、表格、講者備忘稿，圖片放到 `<out_dir>/assets/<pptx-stem>/`，並輸出 `<pptx-stem>_extract.md`。比 PDF 轉檔失真度低很多，PPTX 可直接抽原始結構與原解析度圖片。與 PDF/YouTube 不同，**out_dir 需手動指定**(通常是 `00_Inbox/` 或對應專案的 `source/`)。
@@ -361,7 +377,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ### Word 文件抽取
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
 ```
 
 支援 `.docx` (用 `python-docx`,跨平台,首選) 與 `.doc` (用 Word COM 先轉 `.docx`,**需 Windows + Office**)。輸出 markdown 含標題層級、表格 (合併儲存格已自動去重避免 token 浪費)、內嵌圖片到 `<out_dir>/assets/<stem>/`。**out_dir 需手動指定**。
@@ -369,7 +385,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ### Excel 表單抽取
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
 ```
 
 支援 `.xlsx` / `.xlsm` (用 `openpyxl`,跨平台,首選,以 `data_only=True` 取公式快取值) 與 `.xls` (用 Excel COM 先轉 `.xlsx`,**需 Windows + Office**)。輸出 markdown 含工作表總覽 + 每張工作表的對齊表格 (第一欄是 Excel 原列號,欄頭是 Excel 欄字母,合併儲存格非錨點留白以維持欄位對齊),內嵌圖片放 `<out_dir>/assets/<stem>/`。**out_dir 需手動指定**。Excel 內容 (廠商回填表、規格 checklist、BOM、排程表) 一律優先用本工具而不要先轉 PDF/CSV,以免失去欄位對齊、合併儲存格與隱藏工作表資訊。
@@ -378,13 +394,13 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 
 ```powershell
 # 依資料夾 + filter 搜尋
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --folder "收件匣\01_行政單位\PM" --subject "交期異動" --since 2026-05-01
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --folder "收件匣\01_行政單位\PM" --subject "交期異動" --since 2026-05-01
 
 # 依 EntryID 抽單封
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --entry-id "<EntryID>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --entry-id "<EntryID>"
 
 # 依 ConversationID 抽整串對話
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id "<ConvID>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --conversation-id "<ConvID>"
 ```
 
 用本機 Outlook COM (`pywin32`) + `html2text` 抽信件 metadata、body、附件,**需 Windows + 已登入的 Outlook**。多封信合併成單檔 markdown,附件存到 `assets/<slug>/`。預設輸出到 `00_Inbox/`,可用 `--out-dir` 指定 (整理到專案時通常指向 `10_Projects/<...>/source/`)。常用旗標：`--dry-run` 只列符合的信不抽取、`--html` 保留 HTML body 而非轉 markdown、`--no-attachments` 跳過附件。
@@ -392,8 +408,8 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 ### 專案提醒掃描
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 工具會自動把 YouTube/PDF 結果放入 `00_Inbox/` 並更新 `00_Inbox/目錄.md`；這些結果仍只是 Capture 階段，需要再依 `CODE` / `PARA` 整理。

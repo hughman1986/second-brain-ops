@@ -25,7 +25,7 @@ related:
 
 1. **執行工具**（優先使用固定工具，不手寫一次性腳本）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
    ```
 2. 工具行為：
    - 用 `yt-dlp` 抓 metadata

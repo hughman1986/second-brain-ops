@@ -30,27 +30,27 @@ related:
 
 1. **先 dry-run 確認範圍**（不寫檔，只列出符合條件的信件）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py `
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py `
        --since 2026-06-08 --limit 20 --dry-run
    ```
 
 2. **抓進 Inbox**（一般 capture）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py `
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py `
        --since 2026-06-08 --from "boss@company.com" --subject "review" `
        --slug 0608-review-thread
    ```
 
 3. **抓進專案 source/**（已知所屬 project / area，跳過 Inbox 流程）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py `
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py `
        --conversation-id <ID> --slug cmp-customer-thread `
        --out-dir 10_Projects/cmp-digital-twin/source
    ```
 
 4. **指定 EntryID 抓單封 / 多封**（從 Outlook 取得 EntryID 後）：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py `
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py `
        --entry-id <ID1> --entry-id <ID2> --slug pm-decision
    ```
 

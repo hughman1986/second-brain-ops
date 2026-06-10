@@ -33,7 +33,7 @@ def convert_doc_to_docx(src: Path) -> Path:
     except ImportError as e:
         raise SystemExit(
             "pywin32 required for .doc conversion. Run:\n"
-            "  & 'C:\\Users\\jmhuang\\.venvs\\sb-docs\\Scripts\\python.exe' -m pip install pywin32"
+            "  & '$env:USERPROFILE\\.venvs\\sb-docs\\Scripts\\python.exe' -m pip install pywin32"
         ) from e
 
     tmp_fd, tmp_path = tempfile.mkstemp(suffix=".docx")

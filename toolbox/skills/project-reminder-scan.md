@@ -27,11 +27,11 @@ related:
 1. **先讀 `10_Projects/目錄.md`**，掌握目前有哪些機種與工單、各自目前階段。
 2. **執行提醒掃描**：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py
    ```
    若使用者指定日期或天數：
    ```powershell
-   & 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+   & "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
    ```
    工具會遞迴掃描 `10_Projects/**/schedule.md` 與 `issues.md`，依 `Target Date`、`Remind On`、`Status` 找提醒與逾期。`done` / `closed` / `cancelled` / `canceled` / `skipped` 不列入。
 3. **針對掃描結果**，對每個有提醒、逾期或阻塞的工單：

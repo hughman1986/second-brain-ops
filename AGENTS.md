@@ -160,24 +160,24 @@ capture-* 工具預設把 raw extract、原始檔、assets 放到 `00_Inbox/`，
 新環境一次性建置(只做一次)：
 
 ```powershell
-& 'C:\Users\jmhuang\AppData\Local\miniconda3\python.exe' -m venv 'C:\Users\jmhuang\.venvs\sb-docs'
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl pywin32 html2text
+python -m venv "$env:USERPROFILE\.venvs\sb-docs"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" -m pip install --upgrade pip pymupdf youtube-transcript-api yt-dlp python-pptx python-docx openpyxl pywin32 html2text
 ```
 
 指定 Python：
 
 ```text
-C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
+$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe
 ```
 
-如果以後 base Python 換位置，更新上方第一行路徑；如果 venv 換位置，同步更新本檔與 `README.md`。
+如果以後 base Python 換位置，更新上方第一行；如果 venv 換位置，同步更新本檔與 `README.md`。其他使用者拿到本 repo 時，因路徑都使用 `python` (PATH) 與 `$env:USERPROFILE`，不需修改即可使用。
 
 ### YouTube 字幕
 
 優先使用固定工具，不手寫一次性腳本。
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/youtube_transcript_to_inbox.py "<youtube-url>"
 ```
 
 工具會用 `yt-dlp` 抓 metadata、`youtube-transcript-api` 抓公開字幕；語言優先 `zh-TW`、`zh-Hant`、`zh`、`en`；輸出到 `00_Inbox/YYYY-MM-DD - slug-transcript.md`；同 source 更新既有檔；成功後更新 `00_Inbox/目錄.md` 為 `captured / needs-review`。字幕不可得時不建空檔、不更新目錄。逐字稿只屬 Capture，整理時再依 CODE/PARA 處理。
@@ -187,7 +187,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 優先使用固定工具，不手寫一次性腳本。
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pdf_extract_to_inbox.py "<pdf-path>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/pdf_extract_to_inbox.py "<pdf-path>"
 ```
 
 工具用 PyMuPDF 抽 metadata、頁數、文字、內嵌圖片；輸出到 `00_Inbox/YYYY-MM-DD - slug-extract.md`；圖片放 `00_Inbox/assets/<pdf-slug>/`；同 source 更新既有檔；成功後更新 `00_Inbox/目錄.md` 為 `captured / needs-review`。此工具只做 raw extraction，不 OCR、不做 AI 視覺解讀、不產生摘要或行動項。
@@ -197,7 +197,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 優先使用固定工具，不手寫一次性腳本。PPTX 原生格式失真度遠低於 PDF 轉檔(結構、表格、講者備忘稿、原解析度圖片皆可保留)，若同時有 PPTX 和 PDF 一律優先用 PPTX。
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/pptx_extract.py "<src.pptx>" "<out_dir>"
 ```
 
 工具用 `python-pptx` 逐張投影片抽文字、表格、講者備忘稿，處理 group shapes (recursive) 與內嵌圖片；輸出 `<out_dir>/<pptx-stem>_extract.md` + `<out_dir>/assets/<pptx-stem>/slideXX_N.<ext>`。與 PDF/YouTube 工具不同，**out_dir 需手動指定**(通常是 `00_Inbox/` 或對應專案的 `source/`)，工具不自動更新 `00_Inbox/目錄.md`。此工具只做 raw extraction，不做 AI 視覺解讀、不產生摘要或行動項。
@@ -207,7 +207,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 優先使用固定工具，不手寫一次性腳本(也不要再用「Word COM SaveAs 純文字 + Big5 重編碼」舊 pattern,本工具已涵蓋且輸出乾淨 markdown)。
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/word_extract.py "<src.docx|src.doc>" "<out_dir>"
 ```
 
 自動依副檔名分流:`.docx` 用 `python-docx` 直接解析(跨平台、首選);`.doc` 透過 Word COM (`pywin32`,**需 Windows + Office**) 轉成暫存 `.docx` 再解析。輸出 `<out_dir>/<stem>_extract.md`,包含 Heading 1~6 層級、表格(已處理 horizontal/vertical merged cells 去重,避免合併儲存格內容重複 N 倍 token 浪費)、行內圖片放 `<out_dir>/assets/<stem>/imgN.<ext>`。預設跳過頁首/頁尾避免重複頁碼雜訊。**out_dir 需手動指定**,工具不自動更新 `00_Inbox/目錄.md`。
@@ -217,7 +217,7 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 優先使用固定工具，不手寫一次性腳本。Excel 內容(尤其是廠商回填表、規格 checklist、BOM、排程表)在轉成 PDF 或 CSV 後通常會失去欄位對齊、合併儲存格、隱藏工作表等資訊，請一律優先用本工具。
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/xlsx_extract.py "<src.xlsx|src.xlsm|src.xls>" "<out_dir>"
 ```
 
 自動依副檔名分流:`.xlsx` / `.xlsm` 用 `openpyxl` 直接解析(跨平台、首選,以 `data_only=True` 取得公式快取值);`.xls` 透過 Excel COM (`pywin32`,**需 Windows + Office**) 轉成暫存 `.xlsx` 再解析。輸出 `<out_dir>/<stem>_extract.md`,內含工作表總覽 (名稱 / used range / visible/hidden) 與每張工作表的 Markdown 表格 (第一欄是原 Excel 列號,欄頭是 Excel 欄字母 A/B/...,合併儲存格的非錨點位置會留白以維持欄位對齊);內嵌圖片放 `<out_dir>/assets/<stem>/sheetXX_N.<ext>`。**out_dir 需手動指定**,工具不自動更新 `00_Inbox/目錄.md`。此工具只做 raw extraction,不解圖表 (charts)、不做 AI 視覺解讀、不產生摘要或行動項。
@@ -228,13 +228,13 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 
 ```powershell
 # 預設抓進 00_Inbox/，同步更新目錄.md
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --from "boss@company.com" --subject "review"
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --from "boss@company.com" --subject "review"
 
 # 抓進專案 source/（跳過 Inbox 流程）
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --conversation-id <ID> --slug cmp-customer --out-dir 10_Projects/cmp-digital-twin/source
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --conversation-id <ID> --slug cmp-customer --out-dir 10_Projects/cmp-digital-twin/source
 
 # 列出符合條件但不寫檔
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --limit 20 --dry-run
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/outlook_extract_to_inbox.py --since 2026-06-08 --limit 20 --dry-run
 ```
 
 行為：用 `Outlook.Application` COM 連線；支援 `--folder`（巢狀 `Inbox/Sub/Sub2`）、`--store`、`--since/--until`、`--from`（可重複）、`--subject`（可重複）、`--unread`、`--entry-id`（可重複）、`--conversation-id`、`--limit`、`--html`（HTMLBody 經 `html2text` 轉 markdown）、`--no-attachments`、`--out-dir`、`--dry-run`。輸出單一 Markdown 把多封信合併成 thread，每封含 metadata 表（From/To/Cc/Received/Folder/Importance/Categories/EntryID/ConversationID）+ body + 附件清單；附件 / 嵌入圖存到 `<out_dir>/assets/<slug>/`。預設輸出到 `00_Inbox/YYYY-MM-DD - <slug>-mail.md` 並更新 `00_Inbox/目錄.md` 為 `captured / needs-review`；`--out-dir` 指定其他位置時不動 Inbox 目錄（依 toc-sync 自行更新該資料夾目錄）。此工具只做 raw extraction，不做 AI 摘要 / 行動項；**不修改 Outlook 內容**（不標已讀、不移動、不寄信）。
@@ -244,8 +244,8 @@ C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe
 處理專案進度、週報、提醒、逾期項目時，必須先讀 `10_Projects/目錄.md`，再執行：
 
 ```powershell
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py
-& 'C:\Users\jmhuang\.venvs\sb-docs\Scripts\python.exe' toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py
+& "$env:USERPROFILE\.venvs\sb-docs\Scripts\python.exe" toolbox/project_reminder_scan.py --date 2026-05-23 --days 14
 ```
 
 工具遞迴掃描 `10_Projects/**/schedule.md` 與 `issues.md`，依 `Target Date`、`Remind On`、`Status` 找提醒與逾期；`done`、`closed`、`cancelled`、`canceled`、`skipped` 不列入；輸出含機種與工單欄位的 Markdown report。

@@ -187,7 +187,7 @@ def connect_outlook():
     except ImportError as exc:
         raise SystemExit(
             "pywin32 not available. Run inside the sb-docs venv: "
-            "C:\\Users\\jmhuang\\.venvs\\sb-docs\\Scripts\\python.exe"
+            "$env:USERPROFILE\\.venvs\\sb-docs\\Scripts\\python.exe"
         ) from exc
     app = win32com.client.Dispatch("Outlook.Application")
     return app, app.GetNamespace("MAPI")
