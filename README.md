@@ -23,23 +23,13 @@
    - 推薦 [Miniconda](https://www.anaconda.com/download/success) (Windows 上方便管理多版本)
    - 或 [python.org](https://www.python.org/downloads/windows/) Python **3.10+** (建議 3.11/3.12)，安裝時勾「Add Python to PATH」
 
-   > **Windows + Miniconda 使用者注意**：Miniconda 預設**不會**把 `python` 加到使用者 PATH (官方建議改用 Anaconda Prompt)。但本 repo 的 prompt / skill 都假設 `python` 直接可在一般 PowerShell 呼叫,所以建議手動 prepend 進去 (在新的 PowerShell 視窗執行,只做一次):
+   > **Windows + Miniconda 使用者注意**：Miniconda 預設**不會**把 `python` 加到使用者 PATH (官方建議改用 Anaconda Prompt)，但本 repo 的 prompt / skill 都假設 `python` 在一般 PowerShell 可直接呼叫。若你發現 `python` 解析到 Microsoft Store stub (`...\WindowsApps\python.exe`)，直接對 AI 下這個 prompt：
    >
-   > ```powershell
-   > $conda = "$env:LOCALAPPDATA\miniconda3"   # 或你 Miniconda 實際位置
-   > $bak = "$env:USERPROFILE\path-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss').txt"
-   > $old = [Environment]::GetEnvironmentVariable('Path','User')
-   > Set-Content -Encoding UTF8 -Path $bak -Value $old
-   > $add = @($conda, "$conda\Scripts", "$conda\Library\bin")
-   > $existing = $old -split ';' | Where-Object { $_ -ne '' }
-   > $missing = $add | Where-Object { $_ -notin $existing }
-   > [Environment]::SetEnvironmentVariable('Path', (($missing + $existing) -join ';'), 'User')
-   > Write-Host "已 prepend Miniconda; PATH 備份在: $bak"
+   > ```text
+   > 請幫我把 Miniconda 加到使用者 PATH 最前面 (路徑通常在 %LOCALAPPDATA%\miniconda3)，需要 prepend 三個位置：根目錄、Scripts、Library\bin。動作前請先把目前的使用者 PATH 備份成 %USERPROFILE%\path-backup-<時間戳>.txt，並回報還原指令。
    > ```
    >
-   > 若 PATH 已有 Microsoft Store 的 `python.exe` stub (`...\WindowsApps\python.exe`)，prepend 後 Miniconda 會優先被找到。**改完需重開 PowerShell / VS Code** 才生效。
-   >
-   > 還原：`[Environment]::SetEnvironmentVariable('Path', (Get-Content $bak -Raw).Trim(), 'User')`
+   > **改完需重開 PowerShell / VS Code** 才生效。python.org 安裝且勾過「Add to PATH」者可略過。
 
 3. **打開 AI agent (Copilot CLI / Claude Code / Cursor 等)，下這條總 prompt**
    ```text
